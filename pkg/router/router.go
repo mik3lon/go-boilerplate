@@ -9,4 +9,5 @@ type Router interface {
 	Handle(method, path string, handler http.HandlerFunc)
 	WithMiddleware(middleware ...Middleware) Router
 	Serve(addr string) error
+	Handler() http.Handler
 }

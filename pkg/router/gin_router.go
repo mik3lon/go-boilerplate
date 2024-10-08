@@ -12,8 +12,12 @@ type GinRouter struct {
 	middleware []Middleware
 }
 
+func (g *GinRouter) Handler() http.Handler {
+	return g.Router
+}
+
 // NewGinRouter creates a new instance of GinRouter.
-func NewGinRouter() *GinRouter {
+func NewGinRouter() Router {
 	return &GinRouter{
 		Router: gin.Default(),
 	}

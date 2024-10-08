@@ -27,7 +27,7 @@ func Init(cnf *config.Config) *Kernel {
 		CommandBus: bus_infra.InitCommandBus(),
 		server: &http.Server{
 			Addr:    cnf.AddressPort,
-			Handler: r.Router,
+			Handler: r.Handler(),
 		},
 	}
 
