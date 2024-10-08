@@ -2,7 +2,7 @@ package user_infrastructure
 
 import (
 	"errors"
-	user_domain2 "go-boilerplate/internal/app/module/user/domain"
+	user_domain "go-boilerplate/internal/app/module/user/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,7 +20,7 @@ func NewPostgresUserRepository(dsn string) (*PostgresUserRepository, error) {
 	}
 
 	// Ensure the User table exists
-	err = db.AutoMigrate(&user_domain2.User{})
+	err = db.AutoMigrate(&user_domain.User{})
 	if err != nil {
 		return nil, err
 	}
@@ -31,18 +31,18 @@ func NewPostgresUserRepository(dsn string) (*PostgresUserRepository, error) {
 }
 
 // Save stores a user in the Postgres database.
-func (r *PostgresUserRepository) Save(user *user_domain2.User) error {
+func (r *PostgresUserRepository) Save(user *user_domain.User) error {
 	result := r.DB.Save(user)
 	return result.Error
 }
 
 // FindByID retrieves a user by ID from the Postgres database.
-func (r *PostgresUserRepository) FindByID(id string) (*user_domain2.User, error) {
-	var user user_domain2.User
+func (r *PostgresUserRepository) FindByID(id string) (*user_domain.User, error) {
+	var user user_domain.User
 	result := r.DB.First(&user, "id = ?", id)
 
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, user_domain2.ErrUserNotFound
+		return nil, user_domain.ErrUserNotFound
 	}
 	return &user, result.Error
 }
