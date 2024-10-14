@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	user_application "go-boilerplate/internal/app/module/user/application"
+	user_application "go-boilerplate/internal/app/module/user/application/register_user"
 	"go-boilerplate/internal/pkg/domain/bus"
 	http_writer "go-boilerplate/pkg/http/writer"
 	"net/http"
@@ -16,6 +16,9 @@ func HandleRegisterUser(cb bus.CommandBus) http.HandlerFunc {
 			ID       string `json:"id"`
 			Username string `json:"username"`
 			Email    string `json:"email"`
+			Password string `json:"password"`
+			Name     string `json:"name"`
+			Surname  string `json:"surname"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -25,7 +28,14 @@ func HandleRegisterUser(cb bus.CommandBus) http.HandlerFunc {
 
 		err := cb.Dispatch(
 			context.Background(),
-			user_application.NewRegisterUserCommand(req.ID, req.Username, req.Email),
+			user_application.NewRegisterUserCommand(
+				req.ID,
+				req.Username,
+				req.Email,
+				req.Password,
+				req.Name,
+				req.Surname,
+			),
 		)
 
 		if err != nil {

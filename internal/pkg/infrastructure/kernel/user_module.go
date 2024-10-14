@@ -1,12 +1,15 @@
 package kernel
 
 import (
-	user_application "go-boilerplate/internal/app/module/user/application"
+	"go-boilerplate/internal/app/module/user/application/register_user"
+	user_application2 "go-boilerplate/internal/app/module/user/application/user_sign_in"
 	"go-boilerplate/internal/app/module/user/infrastructure"
 	user_ui "go-boilerplate/internal/app/module/user/ui"
 	"go-boilerplate/pkg/config"
 	"go-boilerplate/pkg/http/middleware"
 	"net/http"
+
+	_ "github.com/jackc/pgx/v4/stdlib" // Import the pgx driver
 )
 
 type UserModule struct {
@@ -21,10 +24,17 @@ func InitUserModule(c *Kernel, cnf *config.Config) *UserModule {
 	}
 
 	um := &UserModule{}
+
 	um.AddCommand(
 		c.CommandBus,
 		&user_application.RegisterUserCommand{},
 		user_application.NewRegisterUserCommandHandler(r),
+	)
+
+	um.AddQuery(
+		c.QueryBus,
+		&user_application2.UserSignInQuery{},
+		user_application2.NewUserSignInQueryHandler(r),
 	)
 
 	return um
@@ -36,5 +46,11 @@ func (m *UserModule) RegisterRoutes(c *Kernel) {
 		http.MethodPost,
 		"/users",
 		user_ui.HandleRegisterUser(c.CommandBus),
+	)
+
+	c.Router.Handle(
+		http.MethodPost,
+		"/users/sign-in",
+		user_ui.HandleUserSignIn(c.QueryBus),
 	)
 }

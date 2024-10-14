@@ -21,7 +21,7 @@ type Kernel struct {
 func Init(cnf *config.Config) *Kernel {
 	r := router.NewGinRouter()
 
-	c := &Kernel{
+	k := &Kernel{
 		Router:     r,
 		QueryBus:   bus_infra.InitQueryBus(),
 		CommandBus: bus_infra.InitCommandBus(),
@@ -31,13 +31,13 @@ func Init(cnf *config.Config) *Kernel {
 		},
 	}
 
-	userModule := InitUserModule(c, cnf)
+	userModule := InitUserModule(k, cnf)
 
-	c.addModule(userModule)
+	k.addModule(userModule)
 
-	c.RegisterModuleRoutes()
+	k.RegisterModuleRoutes()
 
-	return c
+	return k
 }
 
 // RegisterModuleRoutes allows each module to register its routes.

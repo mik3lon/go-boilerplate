@@ -2,23 +2,11 @@ package user_application
 
 import (
 	"context"
+	"errors"
 	user_domain "go-boilerplate/internal/app/module/user/domain"
 	"go-boilerplate/internal/pkg/domain/bus"
+	"golang.org/x/crypto/bcrypt"
 )
-
-type RegisterUserCommand struct {
-	userId   string
-	username string
-	email    string
-}
-
-func NewRegisterUserCommand(userId string, username string, email string) *RegisterUserCommand {
-	return &RegisterUserCommand{userId: userId, username: username, email: email}
-}
-
-func (r *RegisterUserCommand) Id() string {
-	return "register_user_query"
-}
 
 type RegisterUserCommandHandler struct {
 	r user_domain.UserRepository
@@ -28,22 +16,26 @@ func NewRegisterUserCommandHandler(r user_domain.UserRepository) *RegisterUserCo
 	return &RegisterUserCommandHandler{r: r}
 }
 
-func (ruqh *RegisterUserCommandHandler) Handle(_ context.Context, command bus.Command) error {
+func (ruqh *RegisterUserCommandHandler) Handle(ctx context.Context, command bus.Command) error {
 	ruq, ok := command.(*RegisterUserCommand)
 	if !ok {
 		return bus.NewCommandNotValid("command not valid")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(ruq.plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("failed to hash password")
 	}
 
 	u := user_domain.CreateUser(
 		ruq.userId,
 		ruq.username,
 		ruq.email,
-		"",
-		"",
-		"",
-		"",
-		"",
+		string(hashedPassword), // Store hashed password (salt is part of this)
+		ruq.name,
+		ruq.surname,
+		"ROLE_TEMP",
 	)
 
-	return ruqh.r.Save(u)
+	return ruqh.r.Save(ctx, u)
 }
