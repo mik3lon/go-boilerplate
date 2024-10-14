@@ -41,3 +41,11 @@ logs:
 clean:
 	@echo "${CYAN}Cleaning up containers, volumes, and networks...${RESET}"
 	docker compose -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
+
+# execute tests
+tests:
+	@echo "${CYAN} Running tests... ${RESET}"
+	@go test ./... \
+	&& echo "${GREEN}Success: All tests passed!${RESET}" \
+	|| echo "${RED}Error: Some tests failed.${RESET}"
+
